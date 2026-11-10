@@ -1,0 +1,879 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xưởng Squishy</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#fff8fb;
+  color:#76566b;
+}
+button{font-family:inherit;cursor:pointer;border:0}
+.hidden{display:none!important}
+
+/* MÀN HÌNH BẮT ĐẦU */
+#intro{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:20px;
+  background:linear-gradient(135deg,#ffe8f1,#eee8ff);
+}
+.intro-card{
+  max-width:500px;
+  width:100%;
+  padding:40px 25px;
+  background:#ffffffdf;
+  border-radius:30px;
+  box-shadow:0 10px 35px #cda6bd55;
+}
+.logo{font-size:65px}
+.intro-card h1{font-size:35px;color:#bd7b9c}
+.intro-card p{line-height:1.7;color:#98758a}
+.primary{
+  background:#e9a9c7;
+  color:white;
+  border-radius:25px;
+  padding:14px 30px;
+  font-weight:bold;
+  font-size:15px;
+}
+.primary:hover{background:#d98eb4}
+
+/* THANH ĐẦU */
+header{
+  height:65px;
+  padding:0 25px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:white;
+  box-shadow:0 2px 12px #d8b8ca30;
+}
+.brand{font-size:21px;font-weight:bold;color:#bd7b9c}
+.header-btn{
+  padding:9px 16px;
+  border-radius:18px;
+  background:#fff0f6;
+  color:#a96e8b;
+}
+
+/* THANH MENU */
+nav{
+  display:flex;
+  gap:10px;
+  padding:12px 20px;
+  background:white;
+  overflow-x:auto;
+}
+nav button{
+  background:#fff0f6;
+  color:#a87590;
+  padding:10px 17px;
+  border-radius:18px;
+  white-space:nowrap;
+}
+nav button.active{background:#e9b4ce;color:white}
+
+/* GIAO DIỆN CHÍNH */
+#game{min-height:calc(100vh - 110px);padding:15px}
+.game-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 275px;
+  gap:15px;
+  max-width:1450px;
+  margin:auto;
+  align-items:start;
+}
+
+/* KHU VỰC SÁNG TẠO */
+.workspace{
+  min-height:calc(100vh - 145px);
+  background:white;
+  border-radius:22px;
+  padding:15px;
+  box-shadow:0 4px 18px #d9b6c630;
+  display:flex;
+  flex-direction:column;
+}
+.workspace-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.workspace-top h2{font-size:18px;margin:5px}
+.small-btn{
+  padding:9px 12px;
+  border-radius:14px;
+  background:#f9eaf1;
+  color:#a16d87;
+  font-weight:bold;
+}
+.stage{
+  flex:1;
+  min-height:390px;
+  margin-top:12px;
+  border-radius:18px;
+  background:radial-gradient(#f4dce8 1px,transparent 1px);
+  background-size:20px 20px;
+  background-color:#fff9fc;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  overflow:hidden;
+}
+.stage-tip{
+  position:absolute;
+  bottom:12px;
+  font-size:12px;
+  color:#bd96aa;
+  pointer-events:none;
+}
+#squishy{
+  width:190px;
+  height:190px;
+  background:#f5b7d0;
+  border-radius:50%;
+  box-shadow:
+    inset -13px -15px 20px #d58cae70,
+    inset 10px 10px 20px #ffffffa0,
+    0 12px 18px #c995b455;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:absolute;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+  transform-origin:center;
+}
+#squishy:active{cursor:grabbing}
+#face{font-size:55px;pointer-events:none}
+#stickers{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+.sticker{
+  position:absolute;
+  font-size:32px;
+  transform:translate(-50%,-50%);
+}
+
+/* BẢNG CÔNG CỤ BÊN PHẢI */
+.sidebar{
+  position:sticky;
+  top:12px;
+  height:calc(100vh - 140px);
+  min-height:500px;
+  max-height:800px;
+  overflow-y:auto;
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  box-shadow:0 4px 18px #d9b6c630;
+  scrollbar-width:thin;
+}
+.sidebar h3{
+  margin:0 0 12px;
+  color:#ae7591;
+  font-size:15px;
+}
+.tool-section{
+  padding-bottom:16px;
+  margin-bottom:14px;
+  border-bottom:1px solid #f5e4ed;
+}
+.shape-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.shape-btn{
+  height:62px;
+  border-radius:13px;
+  background:#fff3f8;
+  border:2px solid transparent;
+  color:#a96e8b;
+  font-size:27px;
+}
+.shape-btn.selected{
+  border-color:#d994b5;
+  background:#fbe1ed;
+}
+.color-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+}
+.color-btn{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  border:3px solid white;
+  box-shadow:0 0 0 1px #e9d5df;
+}
+.color-btn.selected{box-shadow:0 0 0 3px #c986a7}
+.sticker-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+}
+.sticker-btn{
+  background:#fff1f7;
+  border-radius:12px;
+  padding:10px 2px;
+  font-size:22px;
+}
+.face-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+}
+.face-btn{
+  padding:8px 2px;
+  font-size:22px;
+  background:#fff1f7;
+  border-radius:10px;
+}
+.tool-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.tool-actions button{
+  padding:11px 5px;
+  border-radius:12px;
+  background:#f9eaf1;
+  color:#96657e;
+  font-weight:bold;
+}
+.tool-actions .save{
+  grid-column:span 2;
+  background:#e8b1ca;
+  color:white;
+}
+
+/* CÁC MÀN HÌNH KHÁC */
+.other-screen{
+  max-width:900px;
+  margin:25px auto;
+  padding:25px;
+  background:white;
+  border-radius:22px;
+  text-align:center;
+}
+.collection-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:15px;
+}
+.collection-item{
+  padding:15px;
+  background:#fff3f8;
+  border-radius:16px;
+}
+.mission-card{
+  padding:25px;
+  background:#fff3f8;
+  border-radius:20px;
+  margin:15px 0;
+}
+#message{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#98647f;
+  color:white;
+  padding:12px 20px;
+  border-radius:20px;
+  display:none;
+  z-index:99;
+}
+
+/* GIAO DIỆN ĐIỆN THOẠI */
+@media(max-width:760px){
+  header{padding:0 12px}
+  .game-layout{grid-template-columns:1fr}
+  .workspace{min-height:480px}
+  .stage{min-height:350px}
+  .sidebar{
+    position:relative;
+    top:auto;
+    height:auto;
+    max-height:none;
+    min-height:0;
+    overflow:visible;
+  }
+  #game{padding:10px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- MÀN HÌNH GIỚI THIỆU -->
+<section id="intro">
+  <div class="intro-card">
+    <div class="logo">🧸</div>
+    <h1>XƯỞNG SQUISHY</h1>
+    <p>
+      Chào mừng bạn đến với thế giới Squishy!
+      <br>
+      Hãy tự tay tạo ra những chiếc Squishy
+      thật đáng yêu theo phong cách của riêng bạn.
+    </p>
+    <button class="primary" onclick="startGame()">
+      BẮT ĐẦU SÁNG TẠO ✨
+    </button>
+  </div>
+</section>
+
+<!-- GIAO DIỆN GAME -->
+<div id="app" class="hidden">
+
+<header>
+  <div class="brand">🧸 Xưởng Squishy</div>
+  <button class="header-btn" onclick="goHome()">⌂ Trang chủ</button>
+</header>
+
+<nav>
+  <button class="active" id="tab-create"
+    onclick="showPage('create',this)">🎨 Sáng tạo</button>
+  <button id="tab-mission"
+    onclick="showPage('mission',this)">⭐ Nhiệm vụ</button>
+  <button id="tab-collection"
+    onclick="showPage('collection',this)">🧺 Bộ sưu tập</button>
+</nav>
+
+<!-- TRANG SÁNG TẠO -->
+<section id="createPage">
+<div id="game">
+<div class="game-layout">
+
+  <!-- BÊN TRÁI: KHU VỰC CHƠI -->
+  <main class="workspace">
+    <div class="workspace-top">
+      <h2>✨ Squishy của tôi</h2>
+      <div>
+        <button class="small-btn" onclick="undo()">↶ Hoàn tác</button>
+        <button class="small-btn" onclick="randomize()">🎲 Ngẫu nhiên</button>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div id="squishy">
+        <div id="face">☺️</div>
+        <div id="stickers"></div>
+      </div>
+      <div class="stage-tip">
+        Kéo Squishy để di chuyển và thay đổi hình dáng!
+      </div>
+    </div>
+  </main>
+
+  <!-- BÊN PHẢI: BẢNG CÔNG CỤ -->
+  <aside class="sidebar">
+
+    <div class="tool-section">
+      <h3>① CHỌN HÌNH DẠNG</h3>
+      <div class="shape-grid">
+        <button class="shape-btn selected"
+          onclick="setShape('circle',this)" title="Hình tròn">●</button>
+        <button class="shape-btn"
+          onclick="setShape('heart',this)" title="Hình trái tim">♥</button>
+        <button class="shape-btn"
+          onclick="setShape('star',this)" title="Hình ngôi sao">★</button>
+        <button class="shape-btn"
+          onclick="setShape('cloud',this)" title="Hình đám mây">☁</button>
+        <button class="shape-btn"
+          onclick="setShape('square',this)" title="Hình vuông">■</button>
+        <button class="shape-btn"
+          onclick="setShape('oval',this)" title="Hình bầu dục">⬭</button>
+      </div>
+    </div>
+
+    <div class="tool-section">
+      <h3>② CHỌN MÀU SẮC</h3>
+      <div class="color-grid" id="colorGrid"></div>
+    </div>
+
+    <div class="tool-section">
+      <h3>③ CHỌN BIỂU CẢM</h3>
+      <div class="face-grid">
+        <button class="face-btn" onclick="setFace('☺️')">☺️</button>
+        <button class="face-btn" onclick="setFace('🥺')">🥺</button>
+        <button class="face-btn" onclick="setFace('😴')">😴</button>
+        <button class="face-btn" onclick="setFace('😍')">😍</button>
+        <button class="face-btn" onclick="setFace('😋')">😋</button>
+        <button class="face-btn" onclick="setFace('😎')">😎</button>
+        <button class="face-btn" onclick="setFace('🥰')">🥰</button>
+        <button class="face-btn" onclick="setFace('😚')">😚</button>
+      </div>
+    </div>
+
+    <div class="tool-section">
+      <h3>④ THÊM HÌNH TRANG TRÍ</h3>
+      <div class="sticker-grid">
+        <button class="sticker-btn" onclick="addSticker('⭐')">⭐</button>
+        <button class="sticker-btn" onclick="addSticker('🌸')">🌸</button>
+        <button class="sticker-btn" onclick="addSticker('💗')">💗</button>
+        <button class="sticker-btn" onclick="addSticker('🎀')">🎀</button>
+        <button class="sticker-btn" onclick="addSticker('✨')">✨</button>
+        <button class="sticker-btn" onclick="addSticker('🍓')">🍓</button>
+        <button class="sticker-btn" onclick="addSticker('🐰')">🐰</button>
+        <button class="sticker-btn" onclick="addSticker('☁️')">☁️</button>
+      </div>
+      <button class="small-btn" style="width:100%;margin-top:8px"
+        onclick="clearStickers()">Xóa hình trang trí</button>
+    </div>
+
+    <div class="tool-section">
+      <h3>⑤ CÔNG CỤ</h3>
+      <div class="tool-actions">
+        <button onclick="undo()">↶ Hoàn tác</button>
+        <button onclick="randomize()">🎲 Ngẫu nhiên</button>
+        <button onclick="resetSquishy()">↻ Làm mới</button>
+        <button onclick="saveToCollection()">🧺 Lưu Squishy</button>
+        <button class="save" onclick="downloadPNG()">⬇ Tải ảnh về</button>
+      </div>
+    </div>
+
+  </aside>
+</div>
+</div>
+</section>
+
+<!-- TRANG NHIỆM VỤ -->
+<section id="missionPage" class="other-screen hidden">
+  <h2>⭐ NHIỆM VỤ HẰNG NGÀY</h2>
+  <div class="mission-card">
+    <div style="font-size:55px">🍓</div>
+    <h3>Giấc mơ dâu tây</h3>
+    <p>
+      Hãy tạo một chiếc Squishy màu hồng
+      và trang trí bằng những hình dễ thương!
+    </p>
+    <p>Gợi ý: Chọn màu hồng, hình tròn và thêm hình quả dâu 🍓.</p>
+    <button class="primary"
+      onclick="showPage('create',document.getElementById('tab-create'))">
+      BẮT ĐẦU THỰC HIỆN
+    </button>
+  </div>
+</section>
+
+<!-- TRANG BỘ SƯU TẬP -->
+<section id="collectionPage" class="other-screen hidden">
+  <h2>🧺 BỘ SƯU TẬP CỦA TÔI</h2>
+  <p>Những chiếc Squishy bạn đã tạo và lưu lại.</p>
+  <div id="collectionGrid" class="collection-grid"></div>
+</section>
+
+</div>
+
+<div id="message"></div>
+
+<script>
+const squishy=document.getElementById('squishy');
+const face=document.getElementById('face');
+const stickers=document.getElementById('stickers');
+const stage=document.getElementById('stage');
+
+const colors=[
+ '#F5AFCB','#E9B8F5','#B9A5EF','#A8DCCB',
+ '#FFE49B','#A9C9F5','#F6B69F','#FFFFFF',
+ '#F3A3A3','#C4B5A5'
+];
+
+let currentColor=colors[0];
+let currentShape='circle';
+let history=[];
+let saved=[];
+let scaleX=1,scaleY=1;
+let posX=0,posY=0;
+let dragging=false;
+let startX=0,startY=0;
+let originalX=0,originalY=0;
+
+/* KHỞI ĐỘNG */
+function startGame(){
+ document.getElementById('intro').classList.add('hidden');
+ document.getElementById('app').classList.remove('hidden');
+ makeColorButtons();
+}
+
+/* TẠO BẢNG MÀU */
+function makeColorButtons(){
+ const grid=document.getElementById('colorGrid');
+ grid.innerHTML='';
+ colors.forEach((color,index)=>{
+  const btn=document.createElement('button');
+  btn.className='color-btn'+(index===0?' selected':'');
+  btn.style.background=color;
+  btn.title='Màu '+(index+1);
+  btn.onclick=()=>{
+   saveHistory();
+   currentColor=color;
+   squishy.style.background=color;
+   document.querySelectorAll('.color-btn')
+    .forEach(b=>b.classList.remove('selected'));
+   btn.classList.add('selected');
+  };
+  grid.appendChild(btn);
+ });
+}
+
+/* LƯU LỊCH SỬ */
+function saveHistory(){
+ history.push({
+  color:currentColor,
+  shape:currentShape,
+  face:face.textContent,
+  stickers:stickers.innerHTML,
+  scaleX,scaleY,posX,posY
+ });
+ if(history.length>30)history.shift();
+}
+
+/* CHỌN HÌNH DẠNG */
+function setShape(shape,btn){
+ saveHistory();
+ currentShape=shape;
+
+ squishy.style.width=shape==='oval'?'230px':'190px';
+ squishy.style.height=shape==='oval'?'140px':'190px';
+ squishy.style.borderRadius='50%';
+ squishy.style.clipPath='none';
+
+ if(shape==='heart'){
+  squishy.style.clipPath=
+  'polygon(50% 90%,8% 48%,5% 30%,15% 12%,32% 8%,50% 27%,68% 8%,85% 12%,95% 30%,92% 48%)';
+ }
+ if(shape==='star'){
+  squishy.style.clipPath=
+  'polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 94%,50% 72%,21% 94%,32% 57%,2% 35%,39% 35%)';
+ }
+ if(shape==='cloud'){
+  squishy.style.clipPath=
+  'polygon(20% 75%,5% 65%,3% 48%,12% 35%,28% 32%,34% 15%,53% 8%,68% 20%,73% 35%,91% 34%,99% 50%,94% 70%,80% 78%)';
+ }
+ if(shape==='square'){
+  squishy.style.borderRadius='22px';
+ }
+
+ document.querySelectorAll('.shape-btn')
+  .forEach(b=>b.classList.remove('selected'));
+ btn.classList.add('selected');
+}
+
+/* CHỌN BIỂU CẢM */
+function setFace(value){
+ saveHistory();
+ face.textContent=value;
+}
+
+/* THÊM HÌNH TRANG TRÍ */
+function addSticker(value){
+ saveHistory();
+ const sticker=document.createElement('span');
+ sticker.className='sticker';
+ sticker.textContent=value;
+ sticker.style.left=(20+Math.random()*60)+'%';
+ sticker.style.top=(20+Math.random()*60)+'%';
+ stickers.appendChild(sticker);
+}
+
+function clearStickers(){
+ saveHistory();
+ stickers.innerHTML='';
+}
+
+/* HOÀN TÁC */
+function undo(){
+ if(!history.length){
+  notify('Chưa có thao tác để hoàn tác!');
+  return;
+ }
+ const old=history.pop();
+ currentColor=old.color;
+ currentShape=old.shape;
+ face.textContent=old.face;
+ stickers.innerHTML=old.stickers;
+ scaleX=old.scaleX;
+ scaleY=old.scaleY;
+ posX=old.posX;
+ posY=old.posY;
+
+ squishy.style.background=currentColor;
+ squishy.style.transform=
+  `translate(${posX}px,${posY}px) scale(${scaleX},${scaleY})`;
+
+ updateButtons();
+ notify('Đã hoàn tác!');
+}
+
+/* CẬP NHẬT NÚT ĐƯỢC CHỌN */
+function updateButtons(){
+ document.querySelectorAll('.color-btn').forEach((b,i)=>{
+  b.classList.toggle('selected',colors[i]===currentColor);
+ });
+ document.querySelectorAll('.shape-btn').forEach((b,i)=>{
+  const shapes=['circle','heart','star','cloud','square','oval'];
+  b.classList.toggle('selected',shapes[i]===currentShape);
+ });
+}
+
+/* LÀM MỚI */
+function resetSquishy(){
+ saveHistory();
+ currentColor=colors[0];
+ currentShape='circle';
+ scaleX=1;scaleY=1;posX=0;posY=0;
+
+ squishy.style.background=currentColor;
+ squishy.style.width='190px';
+ squishy.style.height='190px';
+ squishy.style.borderRadius='50%';
+ squishy.style.clipPath='none';
+ squishy.style.transform='none';
+
+ face.textContent='☺️';
+ stickers.innerHTML='';
+ updateButtons();
+ notify('Đã làm mới Squishy!');
+}
+
+/* TẠO NGẪU NHIÊN */
+function randomize(){
+ saveHistory();
+ currentColor=colors[Math.floor(Math.random()*colors.length)];
+ const shapes=['circle','heart','star','cloud','square','oval'];
+ currentShape=shapes[Math.floor(Math.random()*shapes.length)];
+
+ const buttons=document.querySelectorAll('.shape-btn');
+ setShape(currentShape,buttons[shapes.indexOf(currentShape)]);
+
+ squishy.style.background=currentColor;
+ face.textContent=['☺️','🥺','😍','😋','🥰']
+  [Math.floor(Math.random()*5)];
+
+ stickers.innerHTML='';
+ const sticker=document.createElement('span');
+ sticker.className='sticker';
+ sticker.textContent=['⭐','🌸','💗','🎀']
+  [Math.floor(Math.random()*4)];
+ sticker.style.left='75%';
+ sticker.style.top='25%';
+ stickers.appendChild(sticker);
+
+ updateButtons();
+ notify('Đã tạo Squishy ngẫu nhiên!');
+}
+
+/* KÉO VÀ BÓP SQUISHY */
+squishy.addEventListener('pointerdown',e=>{
+ dragging=true;
+ squishy.setPointerCapture(e.pointerId);
+ startX=e.clientX;
+ startY=e.clientY;
+ originalX=posX;
+ originalY=posY;
+ saveHistory();
+ squishy.style.transition='none';
+});
+
+squishy.addEventListener('pointermove',e=>{
+ if(!dragging)return;
+ const dx=e.clientX-startX;
+ const dy=e.clientY-startY;
+
+ posX=originalX+dx;
+ posY=originalY+dy;
+
+ scaleX=Math.max(.65,Math.min(1.5,1+dx/500));
+ scaleY=Math.max(.65,Math.min(1.5,1+dy/500));
+
+ squishy.style.transform=
+  `translate(${posX}px,${posY}px) scale(${scaleX},${scaleY})`;
+});
+
+function endDrag(){
+ if(!dragging)return;
+ dragging=false;
+ squishy.style.transition='transform .2s';
+ scaleX=1;
+ scaleY=1;
+ squishy.style.transform=`translate(${posX}px,${posY}px)`;
+}
+squishy.addEventListener('pointerup',endDrag);
+squishy.addEventListener('pointercancel',endDrag);
+
+/* LƯU BỘ SƯU TẬP */
+function getSnapshot(){
+ return {
+  color:currentColor,
+  shape:currentShape,
+  face:face.textContent,
+  stickers:stickers.innerHTML
+ };
+}
+
+function saveToCollection(){
+ saved.push(getSnapshot());
+ localStorage.setItem('squishyCollection',JSON.stringify(saved));
+ renderCollection();
+ notify('Đã lưu Squishy vào bộ sưu tập! 💗');
+}
+
+function loadCollection(){
+ try{
+  saved=JSON.parse(localStorage.getItem('squishyCollection'))||[];
+ }catch(e){saved=[]}
+ renderCollection();
+}
+
+function renderCollection(){
+ const grid=document.getElementById('collectionGrid');
+ grid.innerHTML='';
+
+ if(!saved.length){
+  grid.innerHTML='<p>Chưa có Squishy nào được lưu.</p>';
+  return;
+ }
+
+ saved.forEach((item,index)=>{
+  const div=document.createElement('div');
+  div.className='collection-item';
+
+  const preview=document.createElement('div');
+  preview.style.width='85px';
+  preview.style.height='85px';
+  preview.style.margin='auto';
+  preview.style.background=item.color;
+  preview.style.borderRadius=item.shape==='square'?'20px':'50%';
+  preview.style.display='grid';
+  preview.style.placeItems='center';
+  preview.style.fontSize='32px';
+  preview.textContent=item.face;
+
+  const title=document.createElement('p');
+  title.textContent='Squishy số '+(index+1);
+
+  const del=document.createElement('button');
+  del.className='small-btn';
+  del.textContent='Xóa';
+  del.onclick=()=>{
+   saved.splice(index,1);
+   localStorage.setItem('squishyCollection',JSON.stringify(saved));
+   renderCollection();
+   notify('Đã xóa Squishy!');
+  };
+
+  div.append(preview,title,del);
+  grid.appendChild(div);
+ });
+}
+
+/* TẢI ẢNH PNG */
+function downloadPNG(){
+ const canvas=document.createElement('canvas');
+ canvas.width=600;
+ canvas.height=600;
+ const ctx=canvas.getContext('2d');
+
+ ctx.fillStyle='#fff8fb';
+ ctx.fillRect(0,0,600,600);
+
+ ctx.fillStyle=currentColor;
+ ctx.beginPath();
+
+ const cx=300,cy=290,r=130;
+
+ if(currentShape==='heart'){
+  ctx.moveTo(cx,cy+120);
+  ctx.bezierCurveTo(cx-230,cy-10,cx-110,cy-160,cx,cy-60);
+  ctx.bezierCurveTo(cx+110,cy-160,cx+230,cy-10,cx,cy+120);
+ }else if(currentShape==='star'){
+  for(let i=0;i<10;i++){
+   const angle=-Math.PI/2+i*Math.PI/5;
+   const radius=i%2===0?r:r*.45;
+   const x=cx+Math.cos(angle)*radius;
+   const y=cy+Math.sin(angle)*radius;
+   if(i===0)ctx.moveTo(x,y);
+   else ctx.lineTo(x,y);
+  }
+ }else{
+  ctx.ellipse(cx,cy,currentShape==='oval'?155:130,
+   currentShape==='oval'?90:130,0,0,Math.PI*2);
+ }
+ ctx.closePath();
+ ctx.fill();
+
+ ctx.textAlign='center';
+ ctx.textBaseline='middle';
+ ctx.font='65px Arial';
+ ctx.fillStyle='#ffffff';
+ ctx.fillText(face.textContent,cx,cy);
+
+ stickers.querySelectorAll('.sticker').forEach(el=>{
+  const left=parseFloat(el.style.left)||50;
+  const top=parseFloat(el.style.top)||50;
+  ctx.font='36px Arial';
+  ctx.fillText(el.textContent,170+left*2.6,160+top*2.6);
+ });
+
+ const link=document.createElement('a');
+ link.download='squishy-cua-toi.png';
+ link.href=canvas.toDataURL('image/png');
+ link.click();
+
+ notify('Đã tải ảnh Squishy về máy!');
+}
+
+/* CHUYỂN TRANG */
+function showPage(page,btn){
+ ['create','mission','collection'].forEach(p=>{
+  document.getElementById(p+'Page')
+   .classList.toggle('hidden',p!==page);
+ });
+
+ document.querySelectorAll('nav button')
+  .forEach(b=>b.classList.remove('active'));
+
+ if(btn)btn.classList.add('active');
+
+ if(page==='collection')renderCollection();
+}
+
+function goHome(){
+ showPage('create',document.getElementById('tab-create'));
+}
+
+/* THÔNG BÁO */
+function notify(text){
+ const box=document.getElementById('message');
+ box.textContent=text;
+ box.style.display='block';
+ clearTimeout(window.notifyTimer);
+ window.notifyTimer=setTimeout(()=>{
+  box.style.display='none';
+ },2200);
+}
+
+loadCollection();
+</script>
+
+</body>
+</html>
